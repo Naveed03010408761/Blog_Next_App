@@ -3,6 +3,7 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 
 export default function SignupForm() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -16,7 +17,12 @@ export default function SignupForm() {
     });
 
     if (res.ok) {
-      await signIn("credentials", { email, password, redirect: true, callbackUrl: "/" });
+      await signIn("credentials", {
+        email,
+        password,
+        redirect: true,
+        callbackUrl: "/",
+      });
     } else {
       alert("Signup failed");
     }
@@ -24,16 +30,32 @@ export default function SignupForm() {
 
   return (
     <form
+      autoComplete="off"
       onSubmit={handleSignup}
-      className="w-full max-w-sm mx-auto mt-20 p-6 bg-white shadow-md rounded-lg"
+      className="w-full max-w-sm mx-auto mt-20 p-8 bg-gray-900 text-white shadow-lg rounded-xl border border-gray-700"
     >
-      <h2 className="text-2xl font-bold text-center mb-4">Sign Up</h2>
+      <h2 className="text-2xl font-bold text-center mb-6">Create Account</h2>
 
       <div className="mb-4">
-        <label className="block text-gray-700 mb-1">Email</label>
+        <label className="block text-gray-300 mb-1">Username</label>
         <input
+          autoComplete="off"
+          type="text"
+          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring focus:ring-green-500"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Enter your Name"
+          required
+        />
+      </div>
+
+
+      <div className="mb-4">
+        <label className="block text-gray-300 mb-1">Email</label>
+        <input
+          autoComplete="off"
           type="email"
-          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring focus:ring-green-500"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Enter your email"
@@ -42,10 +64,11 @@ export default function SignupForm() {
       </div>
 
       <div className="mb-6">
-        <label className="block text-gray-700 mb-1">Password</label>
+        <label className="block text-gray-300 mb-1">Password</label>
         <input
+          autoComplete="new password"
           type="password"
-          className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+          className="w-full px-3 py-2 bg-gray-800 border border-gray-700 rounded-md text-white focus:outline-none focus:ring focus:ring-green-500"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter your password"
@@ -55,7 +78,7 @@ export default function SignupForm() {
 
       <button
         type="submit"
-        className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition"
+        className="w-full bg-green-600 hover:bg-green-700 text-white py-2 rounded-md font-medium transition"
       >
         Sign Up
       </button>
