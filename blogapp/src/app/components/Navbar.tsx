@@ -4,6 +4,15 @@ import { useSession, signOut } from "next-auth/react";
 import Image from "next/image";
 import { useState } from "react";
 
+// ✅ Importing Icons
+import { 
+  HiHome, 
+  HiDocumentText, 
+  HiPlusCircle, 
+  HiUser, 
+  HiShieldCheck 
+} from "react-icons/hi2";
+
 export default function Navbar() {
   const { data: session, status } = useSession();
   const userRole = session?.user?.role; 
@@ -84,18 +93,56 @@ export default function Navbar() {
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)}>
           <aside
-            className={`fixed top-0 left-0 w-64 h-full bg-gray-800 text-white shadow-lg p-5 z-50 transform transition-transform duration-300 ${
+            className={`fixed top-0 left-0 w-44 h-full bg-gray-800 text-white shadow-lg p-5 z-50 transform transition-transform duration-300 ${
               sidebarOpen ? "translate-x-0" : "-translate-x-full"
             }`}
             onClick={(e) => e.stopPropagation()}
           >
             <h2 className="text-xl font-bold mb-4">Dashboard</h2>
+
+            {/* ✅ Icon Only + Hover Text Reveal */}
             <ul className="space-y-3">
-              <li><Link href="/protected/home" className="hover:text-blue-400">Dashboard Home</Link></li>
-              <li><Link href="/protected/posts" className="hover:text-blue-400">My Posts</Link></li>
-              <li><Link href="/protected/new" className="hover:text-blue-400">Create Post</Link></li>
+              <li>
+                <Link href="/protected/home" className="flex items-center gap-2 hover:text-blue-400 group">
+                  <HiHome size={22} />
+                  <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200">
+                    Dashboard Home
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/protected/posts" className="flex items-center gap-2 hover:text-blue-400 group">
+                  <HiDocumentText size={22} />
+                  <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200">
+                    My Posts
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/protected/new" className="flex items-center gap-2 hover:text-blue-400 group">
+                  <HiPlusCircle size={22} />
+                  <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200">
+                    Create Post
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link href="/protected/profile" className="flex items-center gap-2 hover:text-blue-400 group">
+                  <HiUser size={22} />
+                  <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200">
+                    Profile
+                  </span>
+                </Link>
+              </li>
               {userRole === "ADMIN" && (
-                <li><Link href="/protected/admin" className="hover:text-blue-400">Admin Panel</Link></li>
+                <li>
+                  <Link href="/protected/admin" className="flex items-center gap-2 hover:text-blue-400 group">
+                    <HiShieldCheck size={22} />
+                    <span className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-200">
+                      Admin Panel
+                    </span>
+                  </Link>
+                </li>
               )}
             </ul>
 

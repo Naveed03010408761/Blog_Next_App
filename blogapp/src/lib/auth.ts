@@ -7,7 +7,10 @@ import User from "@/models/User";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: process.env.AUTH_SECRET,
 
-  session: { strategy: "jwt" },
+  session: { 
+    strategy: "jwt",
+    maxAge: 60 * 60 * 2
+  },
 
   providers: [
     CredentialsProvider({
@@ -29,12 +32,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const isValid = await bcrypt.compare(credentials.password, user.password);
         if (!isValid) return null;
 
-        // ✅ Return full user data
+        // ✅ Return full user data including avatar and bio
         return { 
           id: user._id.toString(), 
           email: user.email, 
           role: user.role, 
-          name: user.name ?? "User"  // Fallback name if missing
+          name: user.name ?? "User",
+          avatar: user.avatar,  // Add avatar
+          bio: user.bio         // Add bio
         };
       }
     })
@@ -47,6 +52,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.name = user.name;
         token.email = user.email;
         token.role = user.role;
+        token.avatar = user.avatar;  // Add avatar to token
+        token.bio = user.bio;        // Add bio to token
       }
       return token;
     },
@@ -56,7 +63,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         id: token.id as string,
         name: token.name as string,
         email: token.email as string,
-        role: token.role as string
+        role: token.role as string,
+        avatar: token.avatar as string,  // Add avatar to session
+        bio: token.bio as string,        // Add bio to session
       };
       return session;
     }
