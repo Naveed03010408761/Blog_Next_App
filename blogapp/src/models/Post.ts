@@ -9,6 +9,8 @@ export interface IPost extends Document {
   published: boolean;
   author: IUser["_id"];
   tags: mongoose.Types.ObjectId[];
+  likesCount: number;
+  category: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,6 +24,12 @@ const PostSchema = new Schema<IPost>(
     published: { type: Boolean, default: false },
     author: { type: Schema.Types.ObjectId, ref: "User", required: true },
     tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
+    likesCount: { type: Number, default: 0 },
+    category: { 
+      type: Schema.Types.ObjectId, 
+      ref: "Category", 
+      required: true  // Change to false if you want optional categories
+    }
   },
   { timestamps: true }
 );
