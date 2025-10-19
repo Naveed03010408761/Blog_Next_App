@@ -161,7 +161,6 @@
 
 
 
-
 "use client";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
@@ -189,20 +188,35 @@ export default function Navbar() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
 
-  // ✅ Fetch categories dynamically
+  // ✅ Fetch categories ONLY when authenticated
   useEffect(() => {
     const fetchCategories = async () => {
-      try {
-        const res = await fetch("/api/categories");
-        const data = await res.json();
-       setCategories(Array.isArray(data) ? data : data.categories || []);
-
-      } catch (error) {
-        console.error("Failed to fetch categories", error);
+      // Only fetch categories if user is authenticated
+      if (status === "authenticated") {
+        try {
+          const res = await fetch("/api/categories");
+          const data = await res.json();
+          setCategories(Array.isArray(data) ? data : data.categories || []);
+        } catch (error) {
+          console.error("Failed to fetch categories", error);
+        }
+      } else {
+        // Clear categories when not authenticated
+        setCategories([]);
       }
     };
+    
     fetchCategories();
-  }, []);
+  }, [status]); // Re-fetch when authentication status changes
+
+  // ✅ Clear categories on logout
+  const handleSignOut = async () => {
+    // Clear categories immediately
+    setCategories([]);
+    
+    // Then sign out
+    await signOut({ callbackUrl: "/" });
+  };
 
   return (
     <>
@@ -237,28 +251,30 @@ export default function Navbar() {
             </Link>
           </li>
 
-          {/* ✅ Dynamic Categories Dropdown */}
-          <li className="relative group">
-            <button className="hover:text-blue-400 transition flex items-center gap-1">
-              Categories ▾
-            </button>
-            <ul className="absolute left-0 mt-2 bg-gray-800 text-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 w-40">
-              {categories.length > 0 ? (
-                categories.map((cat) => (
-                  <li key={cat._id}>
-                    <Link
-                      href={`/categories/${cat.slug}`}
-                      className="block px-4 py-2 hover:bg-gray-700"
-                    >
-                      {cat.name}
-                    </Link>
-                  </li>
-                ))
-              ) : (
-                <li className="px-4 py-2 text-gray-400 text-sm">No Categories</li>
-              )}
-            </ul>
-          </li>
+          {/* ✅ Dynamic Categories Dropdown - ONLY show when authenticated */}
+          {status === "authenticated" && (
+            <li className="relative group">
+              <button className="hover:text-blue-400 transition flex items-center gap-1">
+                Categories ▾
+              </button>
+              <ul className="absolute left-0 mt-2 bg-gray-800 text-white rounded-md shadow-lg opacity-0 group-hover:opacity-100 invisible group-hover:visible transition-all duration-200 w-40">
+                {categories.length > 0 ? (
+                  categories.map((cat) => (
+                    <li key={cat._id}>
+                      <Link
+                        href={`/categories/${cat.slug}`}
+                        className="block px-4 py-2 hover:bg-gray-700"
+                      >
+                        {cat.name}
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  <li className="px-4 py-2 text-gray-400 text-sm">No Categories</li>
+                )}
+              </ul>
+            </li>
+          )}
 
           <li>
             <Link href="/about" className="hover:text-blue-400 transition">
@@ -270,7 +286,7 @@ export default function Navbar() {
         {/* Auth Buttons */}
         {status === "loading" ? null : status === "authenticated" ? (
           <button
-            onClick={() => signOut()}
+            onClick={handleSignOut} // Use the updated function
             className="bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
           >
             Logout
@@ -285,8 +301,8 @@ export default function Navbar() {
         )}
       </nav>
 
-      {/* Sidebar Overlay */}
-      {sidebarOpen && (
+      {/* Sidebar Overlay - ONLY show when authenticated */}
+      {status === "authenticated" && sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setSidebarOpen(false)}>
           <aside
             className={`fixed top-0 left-0 w-44 h-full bg-gray-800 text-white shadow-lg p-5 z-50 transform transition-transform duration-300 ${
